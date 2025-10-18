@@ -1,11 +1,11 @@
 const db = require("../db/applicationDB/queries");
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-export const registerPost = async (req, res) => {
+const registerPost = async (req, res) => {
   try {
     const { email, password, confirmPassword } = req.body;
-
+    console.log(req.body);
     if (password !== confirmPassword) {
       return res.status(400).json({ error: "Passwords do not match" });
     }
@@ -15,11 +15,11 @@ export const registerPost = async (req, res) => {
       return res.status(400).json({ error: "User already registered" });
     }
 
+    console.log("User registered:", email);
     await db.addUser({ email, password });
 
     res.status(201).json({
       message: "Registered successfully",
-      application_id: appId,
     });
   } catch (err) {
     console.error("Registration error:", err.message);
@@ -27,7 +27,7 @@ export const registerPost = async (req, res) => {
   }
 };
 
-export const loginPost = async (req, res) => {
+const loginPost = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await db.getUserByEmail(email);
@@ -49,3 +49,5 @@ export const loginPost = async (req, res) => {
     res.status(500).json({ error: "Login failed" });
   }
 };
+
+module.exports = { registerPost, loginPost };

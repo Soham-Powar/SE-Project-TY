@@ -3,11 +3,12 @@ const bcrypt = require("bcryptjs");
 
 async function addUser({ email, password }) {
   const hashed = await bcrypt.hash(password, 10);
+  console.log("Adding user:", email);
 
-  await pool.query(
-    "INSERT INTO users (email, password_hash, application_id) VALUES ($1, $2, $3)",
-    [email, hashed]
-  );
+  await pool.query("INSERT INTO users (email, password_hash) VALUES ($1, $2)", [
+    email,
+    hashed,
+  ]);
 }
 
 async function getUserByEmail(email) {

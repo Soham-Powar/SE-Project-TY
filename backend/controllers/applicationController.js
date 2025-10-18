@@ -1,4 +1,4 @@
-import { pool } from "../db/pool.js";
+const pool = require("../db/pool");
 
 export const submitApplication = async (req, res) => {
   const {

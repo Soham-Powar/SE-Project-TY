@@ -2,13 +2,15 @@ const express = require("express");
 const path = require("node:path");
 const app = express();
 
+require("dotenv").config();
+
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 const assetsPath = path.join(__dirname, "public");
 app.use(express.static(assetsPath));
 
-const appRoutes = require("./routes/applicationRoutes");
+const applicationRoutes = require("./routes/applicationRoutes");
 const authRoutes = require("./routes/authRoutes");
 
 app.use(express.json());

@@ -1,7 +1,7 @@
 //format of token
 //authorization: Bearer <access_token>
 
-export default function verifyToken(req, res, next) {
+function verifyToken(req, res, next) {
   //get auth header value
   const bearerHeader = req.headers["authorization"];
   //check if bearer is undefined
@@ -18,3 +18,5 @@ export default function verifyToken(req, res, next) {
     res.sendStatus(403);
   }
 }
+
+module.exports = verifyToken;

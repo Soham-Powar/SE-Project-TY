@@ -22,6 +22,10 @@ app.use("/uploads", express.static("uploads"));
 app.use("/auth", authRoutes);
 // app.use("/application", applicationRoutes);
 
+app.get("/", (req, res) => {
+  res.send("API is running....");
+});
+
 app.listen(3000, () => {
   console.log("lets go");
 });

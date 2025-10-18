@@ -1,22 +1,15 @@
-// App.jsx
+import { BrowserRouter as Router } from 'react-router-dom';
+import AppRoutes from './routes/AppRoutes';
+import { AuthProvider } from './context/AuthContext';
 
-import { useState } from "react";
-
-const App = () => {
-	const [heading, setHeading] = useState("Magnificent Monkeys");
-
-	const handleClick = () => {
-		setHeading("Radical Rhinos")
-	}
-
+function App() {
 	return (
-		<>
-			<button type="button" onClick={handleClick}>
-				Click Me
-			</button>
-			<h1>{heading}</h1>
-		</>
-	)
+		<AuthProvider>
+			<Router>
+				<AppRoutes />
+			</Router>
+		</AuthProvider>
+	);
 }
 
 export default App;

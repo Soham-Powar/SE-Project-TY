@@ -1,9 +1,8 @@
-import express from "express";
-import multer from "multer";
-import fs from "fs";
-import path from "path";
-import { submitApplication } from "../controllers/applicationController.js";
-
+const express = require("express");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+const { submitApplication } = require("../controllers/applicationController");
 const router = express.Router();
 
 // Base uploads folder
@@ -17,31 +16,30 @@ if (!fs.existsSync(baseDir)) {
 // Multer storage setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Expect application_id from frontend (req.body)
-    const appId = req.body.application_id;
+    // Use user_id instead of application_id
+    const userId = req.body.user_id;
 
-    if (!appId) {
-      return cb(new Error("Missing application_id in form data"));
+    if (!userId) {
+      return cb(new Error("Missing user_id in form data"));
     }
 
-    const appFolder = path.join(baseDir, appId);
+    const userFolder = path.join(baseDir, userId.toString());
 
-    // Create the folder if it doesn’t exist
-    if (!fs.existsSync(appFolder)) {
-      fs.mkdirSync(appFolder, { recursive: true });
+    // Create folder if not exists
+    if (!fs.existsSync(userFolder)) {
+      fs.mkdirSync(userFolder, { recursive: true });
     }
 
-    cb(null, appFolder);
+    cb(null, userFolder);
   },
 
   filename: (req, file, cb) => {
-    // Save with meaningful names based on fieldname
     const ext = path.extname(file.originalname);
     const cleanName =
       file.fieldname === "receipt"
         ? "receipt" + ext
-        : file.fieldname === "application_copy"
-        ? "application" + ext
+        : file.fieldname === "merit_document"
+        ? "merit_document" + ext
         : Date.now() + "-" + file.originalname;
 
     cb(null, cleanName);
@@ -59,14 +57,14 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter });
 
-// Accept multiple uploads (e.g. receipt + application copy)
+// Endpoint for application submission
 router.post(
   "/apply",
   upload.fields([
     { name: "receipt", maxCount: 1 },
-    { name: "application_copy", maxCount: 1 },
+    { name: "merit_document", maxCount: 1 },
   ]),
   submitApplication
 );
 
-export default router;
+module.exports = router;

@@ -13,7 +13,7 @@ app.set("view engine", "ejs");
 const assetsPath = path.join(__dirname, "public");
 app.use(express.static(assetsPath));
 
-// const applicationRoutes = require("./routes/applicationRoutes");
+const applicationRoutes = require("./routes/applicationRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 
@@ -22,7 +22,7 @@ app.use("/uploads", express.static("uploads"));
 
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
-// app.use("/application", applicationRoutes);
+app.use("/application", applicationRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running....");

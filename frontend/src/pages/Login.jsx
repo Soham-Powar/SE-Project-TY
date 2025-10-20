@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { jwtDecode } from "jwt-decode";
 
 export default function Login() {
 	const [email, setEmail] = useState('');
@@ -26,8 +27,16 @@ export default function Login() {
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.error || 'Login failed');
 
+			// Save token to context + localStorage
 			login(data.token);
-			navigate('/');
+
+			// Decode JWT to check if admin
+			const decoded = jwtDecode(data.token);
+			if (decoded.email === 'admin@unimis.com') {
+				navigate('/admin');
+			} else {
+				navigate('/');
+			}
 		} catch (err) {
 			setError(err.message);
 		} finally {
@@ -39,22 +48,29 @@ export default function Login() {
 		<div className="w-full max-w-md p-8 bg-white rounded shadow">
 			<h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 			<form className="flex flex-col gap-4" onSubmit={handleLogin}>
-				<input
-					type="email"
-					placeholder="Email"
-					value={email}
-					onChange={e => setEmail(e.target.value)}
-					className="border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-					required
-				/>
-				<input
-					type="password"
-					placeholder="Password"
-					value={password}
-					onChange={e => setPassword(e.target.value)}
-					className="border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-					required
-				/>
+				<div>
+					<label className="block font-medium mb-1">Email</label>
+					<input
+						type="email"
+						placeholder="Enter your email"
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+						className="border w-full px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+						required
+					/>
+				</div>
+				<div>
+					<label className="block font-medium mb-1">Password</label>
+					<input
+						type="password"
+						placeholder="Enter your password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+						className="border w-full px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+						required
+					/>
+				</div>
+
 				<button
 					type="submit"
 					disabled={loading}
@@ -63,7 +79,8 @@ export default function Login() {
 					{loading ? 'Logging in...' : 'Login'}
 				</button>
 			</form>
-			{error && <p className="text-red-500 mt-2">{error}</p>}
+
+			{error && <p className="text-red-500 mt-2 text-center">{error}</p>}
 		</div>
 	);
 }

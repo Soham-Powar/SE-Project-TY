@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
+
 
 export default function Home() {
 	const { user, logout } = useContext(AuthContext);
@@ -8,6 +10,16 @@ export default function Home() {
 	const [id, setId] = useState('');
 	const [error, setError] = useState('');
 	const navigate = useNavigate();
+
+	// Check if current user is admin
+	const isAdmin = (() => {
+		try {
+			const decoded = jwtDecode(user?.token);
+			return decoded.email === 'admin@unimis.com';
+		} catch {
+			return false;
+		}
+	})();
 
 	useEffect(() => {
 		const fetchUserData = async () => {
@@ -42,12 +54,25 @@ export default function Home() {
 			{email && <p className="mb-2">Your ID: <span className="font-medium">{id}</span></p>}
 			{error && <p className="text-red-500 mb-2">{error}</p>}
 
-			<button
-				onClick={() => navigate('/apply')}
-				className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-			>
-				Go to Application Form
-			</button>
+			{/* Normal user: Show Application Form */}
+			{!isAdmin && (
+				<button
+					onClick={() => navigate('/apply')}
+					className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+				>
+					Go to Application Form
+				</button>
+			)}
+
+			{/* Admin user: Show Admin Dashboard button */}
+			{isAdmin && (
+				<button
+					onClick={() => navigate('/admin')}
+					className="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700"
+				>
+					Go to Admin Dashboard
+				</button>
+			)}
 
 			<button
 				onClick={logout}

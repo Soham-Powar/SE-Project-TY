@@ -1,21 +1,20 @@
-import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-
 
 export default function Home() {
 	const { user, logout } = useContext(AuthContext);
-	const [email, setEmail] = useState('');
-	const [id, setId] = useState('');
-	const [error, setError] = useState('');
+	const [email, setEmail] = useState("");
+	const [id, setId] = useState("");
+	const [error, setError] = useState("");
 	const navigate = useNavigate();
 
 	// Check if current user is admin
 	const isAdmin = (() => {
 		try {
 			const decoded = jwtDecode(user?.token);
-			return decoded.email === 'admin@unimis.com';
+			return decoded.email === "admin@unimis.com";
 		} catch {
 			return false;
 		}
@@ -25,16 +24,16 @@ export default function Home() {
 		const fetchUserData = async () => {
 			try {
 				const token = user?.token;
-				if (!token) throw new Error('No token found');
+				if (!token) throw new Error("No token found");
 
-				const res = await fetch('http://localhost:3000/user/profile', {
+				const res = await fetch("http://localhost:3000/user/profile", {
 					headers: {
-						'Authorization': `Bearer ${token}`,
-						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+						"Content-Type": "application/json",
 					},
 				});
 
-				if (!res.ok) throw new Error('Failed to fetch user data');
+				if (!res.ok) throw new Error("Failed to fetch user data");
 
 				const data = await res.json();
 				setId(data.id);
@@ -48,27 +47,33 @@ export default function Home() {
 	}, [user]);
 
 	return (
-		<div className="w-full max-w-md p-8 bg-white rounded shadow text-center flex flex-col gap-4">
-			<h1 className="text-2xl font-bold mb-2">Welcome!</h1>
-			{email && <p className="mb-2">Your email: <span className="font-medium">{email}</span></p>}
-			{email && <p className="mb-2">Your ID: <span className="font-medium">{id}</span></p>}
-			{error && <p className="text-red-500 mb-2">{error}</p>}
+		// <div className="flex justify-center items-center min-h-[80vh] bg-gradient-to-b from-purple-50 to-white px-4">
+		<div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 border border-gray-100 text-center">
+			<h1 className="text-3xl font-bold text-purple-700 mb-4">Welcome!</h1>
 
-			{/* Normal user: Show Application Form */}
-			{!isAdmin && (
+			{email && (
+				<p className="mb-2 text-gray-700">
+					<span className="font-medium">Email:</span> {email}
+				</p>
+			)}
+			{id && (
+				<p className="mb-4 text-gray-700">
+					<span className="font-medium">User ID:</span> {id}
+				</p>
+			)}
+			{error && <p className="text-red-500 mb-4">{error}</p>}
+
+			{!isAdmin ? (
 				<button
-					onClick={() => navigate('/apply')}
-					className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+					onClick={() => navigate("/apply")}
+					className="bg-purple-600 text-white py-2 px-6 rounded-lg hover:bg-purple-700 transition font-medium"
 				>
 					Go to Application Form
 				</button>
-			)}
-
-			{/* Admin user: Show Admin Dashboard button */}
-			{isAdmin && (
+			) : (
 				<button
-					onClick={() => navigate('/admin')}
-					className="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700"
+					onClick={() => navigate("/admin")}
+					className="bg-purple-700 text-white py-2 px-6 rounded-lg hover:bg-purple-800 transition font-medium"
 				>
 					Go to Admin Dashboard
 				</button>
@@ -76,10 +81,11 @@ export default function Home() {
 
 			<button
 				onClick={logout}
-				className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 mt-2"
+				className="bg-red-500 hover:bg-red-600 text-white py-2 px-6 rounded-lg mt-4 transition font-medium"
 			>
 				Logout
 			</button>
 		</div>
+		// </div>
 	);
 }

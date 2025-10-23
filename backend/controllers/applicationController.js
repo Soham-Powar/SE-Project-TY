@@ -15,7 +15,18 @@ const submitApplication = async (req, res) => {
   } = req.body;
 
   try {
-    // Get user email from users table
+    // 1️⃣ Check if user already submitted an application
+    const existing = await pool.query(
+      "SELECT id FROM applications WHERE user_id = $1",
+      [user_id]
+    );
+    if (existing.rows.length > 0) {
+      return res
+        .status(400)
+        .json({ error: "Application already submitted for this user" });
+    }
+
+    // 2️⃣ Verify user exists and get email
     const userResult = await pool.query(
       "SELECT email FROM users WHERE id = $1",
       [user_id]
@@ -25,13 +36,13 @@ const submitApplication = async (req, res) => {
     }
     const email = userResult.rows[0].email;
 
-    // Uploaded file paths from multer
+    // 3️⃣ Uploaded file paths from multer
     const receiptPath = req.files?.receipt ? req.files.receipt[0].path : null;
     const meritDocumentPath = req.files?.merit_document
       ? req.files.merit_document[0].path
       : null;
 
-    // Insert into applications table
+    // 4️⃣ Insert new application
     await pool.query(
       `INSERT INTO applications 
         (user_id, email, firstname, middlename, lastname, dob, phone, address,
@@ -61,10 +72,14 @@ const submitApplication = async (req, res) => {
     });
   } catch (err) {
     console.error("Error inserting application:", err.message);
+    // 5️⃣ Handle unique constraint violation (if you add it in DB)
+    if (err.code === "23505") {
+      return res
+        .status(400)
+        .json({ error: "Duplicate application not allowed" });
+    }
     res.status(500).json({ error: "Database error" });
   }
 };
 
-module.exports = {
-  submitApplication,
-};
+module.exports = { submitApplication };

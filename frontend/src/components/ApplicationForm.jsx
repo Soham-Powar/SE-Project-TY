@@ -6,6 +6,7 @@ export default function ApplicationForm() {
 	const [userId, setUserId] = useState("");
 	const [email, setEmail] = useState("");
 	const [hasApplied, setHasApplied] = useState(false);
+	const [feeStatus, setFeeStatus] = useState("pending");
 
 	const [firstname, setFirstname] = useState("");
 	const [middlename, setMiddlename] = useState("");
@@ -15,7 +16,6 @@ export default function ApplicationForm() {
 	const [address, setAddress] = useState("");
 	const [course, setCourse] = useState("");
 	const [isScholarship, setIsScholarship] = useState(false);
-	const [feeStatus, setFeeStatus] = useState("pending");
 	const [receipt, setReceipt] = useState(null);
 	const [meritDocument, setMeritDocument] = useState(null);
 
@@ -23,7 +23,7 @@ export default function ApplicationForm() {
 	const [message, setMessage] = useState("");
 	const [error, setError] = useState("");
 
-	// ✅ Fetch user info and check if already applied
+	// ✅ Fetch user info + check application
 	useEffect(() => {
 		const fetchUserData = async () => {
 			try {
@@ -38,7 +38,7 @@ export default function ApplicationForm() {
 				setEmail(data.email);
 				setUserId(data.id);
 
-				// 🔍 Check if already applied
+				// ✅ Check if already applied + get fee status
 				const checkRes = await fetch(
 					`http://localhost:3000/application/check/${data.id}`,
 					{
@@ -46,9 +46,14 @@ export default function ApplicationForm() {
 					}
 				);
 				const checkData = await checkRes.json();
+
 				if (checkData.hasApplied) {
 					setHasApplied(true);
 					setMessage("✅ You have already submitted your application.");
+
+					if (checkData.application?.fee_status) {
+						setFeeStatus(checkData.application.fee_status);
+					}
 				}
 			} catch (err) {
 				console.error(err);
@@ -88,8 +93,8 @@ export default function ApplicationForm() {
 			});
 
 			const data = await res.json();
-
 			if (!res.ok) throw new Error(data?.error || "Failed to submit");
+
 			setMessage("🎉 Application submitted successfully!");
 			setHasApplied(true);
 		} catch (err) {
@@ -99,22 +104,40 @@ export default function ApplicationForm() {
 		}
 	};
 
-	// ✅ If user already applied
+	// ✅ Already applied view
 	if (hasApplied) {
 		return (
-			<div className="max-w-2xl mx-auto p-8 bg-white rounded shadow-lg text-center">
-				<h2 className="text-3xl font-bold text-purple-700 mb-4">Application Status</h2>
-				<p className="text-green-600 text-lg font-medium mb-4">{message}</p>
+			<div className="max-w-2xl mx-auto p-8 bg-white rounded-2xl shadow-lg text-center">
+				<h2 className="text-3xl font-bold text-purple-700 mb-4">
+					Application Status
+				</h2>
+				<p className="text-green-600 text-lg font-medium mb-2">{message}</p>
+
+				<p className="text-gray-700 mb-4">
+					Fee Status:{" "}
+					<span
+						className={`font-semibold ${feeStatus === "paid"
+							? "text-green-600"
+							: feeStatus === "pending"
+								? "text-yellow-500"
+								: "text-blue-500"
+							}`}
+					>
+						{feeStatus.toUpperCase()}
+					</span>
+				</p>
+
 				<p className="text-gray-600">
-					Thank you, <span className="font-semibold">{email}</span>. You can only submit once.
+					Thank you, <span className="font-semibold">{email}</span>. You can
+					only submit once.
 				</p>
 			</div>
 		);
 	}
 
-	// ✅ Otherwise show form
+	// ✅ Show form if not applied
 	return (
-		<div className="max-w-3xl mx-auto p-8 bg-white rounded shadow-lg">
+		<div className="max-w-3xl mx-auto p-8 bg-white rounded-2xl shadow-lg">
 			<h2 className="text-3xl font-bold text-center mb-8 text-purple-700">
 				Submit Your Application
 			</h2>
@@ -146,35 +169,24 @@ export default function ApplicationForm() {
 
 				{/* Name Fields */}
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-					<div>
-						<label className="block font-medium mb-1">First Name *</label>
-						<input
-							type="text"
-							value={firstname}
-							onChange={(e) => setFirstname(e.target.value)}
-							className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
-							required
-						/>
-					</div>
-					<div>
-						<label className="block font-medium mb-1">Middle Name</label>
-						<input
-							type="text"
-							value={middlename}
-							onChange={(e) => setMiddlename(e.target.value)}
-							className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
-						/>
-					</div>
-					<div>
-						<label className="block font-medium mb-1">Last Name *</label>
-						<input
-							type="text"
-							value={lastname}
-							onChange={(e) => setLastname(e.target.value)}
-							className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
-							required
-						/>
-					</div>
+					{[
+						{ label: "First Name", val: firstname, set: setFirstname, req: true },
+						{ label: "Middle Name", val: middlename, set: setMiddlename },
+						{ label: "Last Name", val: lastname, set: setLastname, req: true },
+					].map((f, i) => (
+						<div key={i}>
+							<label className="block font-medium mb-1">
+								{f.label} {f.req && <span className="text-red-500">*</span>}
+							</label>
+							<input
+								type="text"
+								value={f.val}
+								onChange={(e) => f.set(e.target.value)}
+								className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
+								required={f.req}
+							/>
+						</div>
+					))}
 				</div>
 
 				{/* DOB & Phone */}
@@ -241,38 +253,33 @@ export default function ApplicationForm() {
 				{/* Fee Status */}
 				<div>
 					<label className="block font-medium mb-1">Fee Status</label>
-					<select
+					<input
+						type="text"
 						value={feeStatus}
-						onChange={(e) => setFeeStatus(e.target.value)}
-						className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
-					>
-						<option value="paid">Paid</option>
-						<option value="pending">Pending</option>
-						<option value="scholarship">Scholarship</option>
-					</select>
+						readOnly
+						className="w-full border px-3 py-2 rounded bg-gray-100 cursor-not-allowed"
+					/>
 				</div>
 
 				{/* File Uploads */}
-				<div>
-					<label className="block font-medium mb-1">Upload Fee Receipt *</label>
-					<input
-						type="file"
-						onChange={(e) => setReceipt(e.target.files[0])}
-						accept=".pdf,.jpg,.png"
-						className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
-						required
-					/>
-				</div>
-				<div>
-					<label className="block font-medium mb-1">Upload Merit Document *</label>
-					<input
-						type="file"
-						onChange={(e) => setMeritDocument(e.target.files[0])}
-						accept=".pdf,.jpg,.png"
-						className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
-						required
-					/>
-				</div>
+				{["Fee Receipt", "Merit Document"].map((label, idx) => (
+					<div key={idx}>
+						<label className="block font-medium mb-1">
+							Upload {label} <span className="text-red-500">*</span>
+						</label>
+						<input
+							type="file"
+							onChange={(e) =>
+								idx === 0
+									? setReceipt(e.target.files[0])
+									: setMeritDocument(e.target.files[0])
+							}
+							accept=".pdf,.jpg,.png"
+							className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
+							required
+						/>
+					</div>
+				))}
 
 				{/* Submit */}
 				<button

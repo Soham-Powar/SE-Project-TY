@@ -17,6 +17,7 @@ const applicationRoutes = require("./routes/applicationRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
@@ -24,6 +25,7 @@ app.use("/", adminRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/application", applicationRoutes);
+app.use("/payment", paymentRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running....");

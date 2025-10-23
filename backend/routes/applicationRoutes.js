@@ -53,22 +53,47 @@ const upload = multer({ storage, fileFilter });
 ========================================================== */
 
 // 🟢 Check if user already submitted application
-router.get("/check/:user_id", verifyToken, async (req, res) => {
+router.get("/check/:id", verifyToken, async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const { id } = req.params;
     const result = await pool.query(
-      "SELECT id FROM applications WHERE user_id = $1",
+      "SELECT * FROM applications WHERE user_id = $1",
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.json({ hasApplied: false });
+    }
+
+    res.json({
+      hasApplied: true,
+      application: result.rows[0], // includes fee_status, etc.
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.get("/status/:user_id", verifyToken, async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    const result = await pool.query(
+      "SELECT fee_status FROM applications WHERE user_id = $1",
       [user_id]
     );
 
-    if (result.rows.length > 0) {
-      return res.json({ hasApplied: true });
-    } else {
-      return res.json({ hasApplied: false });
-    }
+    if (result.rows.length === 0)
+      return res.json({ hasApplied: false, fee_status: null });
+
+    res.json({
+      hasApplied: true,
+      fee_status: result.rows[0].fee_status,
+    });
   } catch (err) {
-    console.error("Error checking application:", err.message);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Error fetching application status:", err);
+    res.status(500).json({ error: "Database error" });
   }
 });
 

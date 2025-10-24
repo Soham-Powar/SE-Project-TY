@@ -42,6 +42,12 @@ const submitApplication = async (req, res) => {
       ? req.files.merit_document[0].path
       : null;
 
+    // check scholarship
+    let fee_status_final = fee_status;
+    if (is_scholarship === "true") {
+      fee_status_final = "scholarship";
+    }
+
     // 4️⃣ Insert new application
     await pool.query(
       `INSERT INTO applications 
@@ -58,7 +64,7 @@ const submitApplication = async (req, res) => {
         phone,
         address,
         is_scholarship === "true" || is_scholarship === true,
-        fee_status,
+        fee_status_final,
         receiptPath,
         meritDocumentPath,
         course,

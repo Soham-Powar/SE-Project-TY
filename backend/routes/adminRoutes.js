@@ -8,6 +8,9 @@ const {
   getAllApplications,
   updateApplicationStatus,
 } = require("../controllers/adminControllers");
+const {
+  migrateConfirmedStudents,
+} = require("../controllers/migrationControllers");
 
 // Admin routes
 router.get("/admin/applications", verifyToken, verifyAdmin, getAllApplications);
@@ -17,5 +20,7 @@ router.put(
   verifyAdmin,
   updateApplicationStatus
 );
+
+router.post("/admin/migrate", verifyToken, migrateConfirmedStudents);
 
 module.exports = router;

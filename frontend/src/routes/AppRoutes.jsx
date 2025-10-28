@@ -9,6 +9,8 @@ import Signup from '../pages/Signup';
 import Home from '../pages/Home';
 import ApplicationForm from '../components/ApplicationForm';
 import AdminDashboard from '../components/AdminDashboard';
+import MISLoginPage from "../pages/MISLoginPage"
+import StudentDashboard from '../pages/StudentDashboard';
 
 export default function AppRoutes() {
 	const { user } = useContext(AuthContext);
@@ -48,6 +50,8 @@ export default function AppRoutes() {
 				path="/apply"
 				element={user ? <ApplicationForm /> : <Navigate to="/login" />}
 			/>
+			<Route path="/mis/login" element={<MISLoginPage />} />
+			<Route path="/mis/student" element={<StudentDashboard />} />
 
 			{/* Admin Routes */}
 			<Route

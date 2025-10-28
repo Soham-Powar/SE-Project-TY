@@ -18,6 +18,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const misAuthRoutes = require("./routes/misRoutes/misAuthRoutes");
 
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
@@ -26,6 +27,10 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/application", applicationRoutes);
 app.use("/payment", paymentRoutes);
+app.use("/mis/auth", misAuthRoutes);
+app.use("/admin", require("./routes/misRoutes/misAdminRoutes"));
+app.use("/teacher", require("./routes/misRoutes/misTeacherRoutes"));
+app.use("/mis/student", require("./routes/misRoutes/misStudentRoutes"));
 
 app.get("/", (req, res) => {
   res.send("API is running....");

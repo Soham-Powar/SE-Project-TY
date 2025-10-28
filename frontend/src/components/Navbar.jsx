@@ -25,32 +25,56 @@ export default function Navbar() {
 				UniMIS
 			</h1>
 
-			{!user ? (
-				<div className="flex items-center gap-6">
-					<Link to="/" className="hover:text-gray-200">Home</Link>
-					<Link to="/login" className="hover:text-gray-200">Login</Link>
-					<Link to="/signup" className="hover:text-gray-200">Signup</Link>
-				</div>
-			) : (
-				<div className="flex items-center gap-6">
-					<Link to="/" className="hover:text-gray-200">Home</Link>
+			<div className="flex items-center gap-6">
+				{/* Always visible links */}
+				<Link to="/" className="hover:text-gray-200">
+					Home
+				</Link>
 
-					{!isAdmin && (
-						<Link to="/apply" className="hover:text-gray-200">Apply</Link>
-					)}
+				{/* When no user is logged in (admissions side) */}
+				{!user && (
+					<>
+						<Link to="/login" className="hover:text-gray-200">
+							Login
+						</Link>
+						<Link to="/signup" className="hover:text-gray-200">
+							Signup
+						</Link>
 
-					{isAdmin && (
-						<Link to="/admin" className="hover:text-gray-200">Dashboard</Link>
-					)}
+						{/* MIS Login button (common for teachers & students) */}
+						<Link
+							to="/mis/login"
+							className="bg-white text-purple-700 px-3 py-1 rounded font-medium hover:bg-gray-100 transition"
+						>
+							MIS Login
+						</Link>
+					</>
+				)}
 
-					<button
-						onClick={logout}
-						className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
-					>
-						Logout
-					</button>
-				</div>
-			)}
+				{/* When admissions user (student/admin) is logged in */}
+				{user && (
+					<>
+						{!isAdmin && (
+							<Link to="/apply" className="hover:text-gray-200">
+								Apply
+							</Link>
+						)}
+
+						{isAdmin && (
+							<Link to="/admin" className="hover:text-gray-200">
+								Dashboard
+							</Link>
+						)}
+
+						<button
+							onClick={logout}
+							className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
+						>
+							Logout
+						</button>
+					</>
+				)}
+			</div>
 		</nav>
 	);
 }

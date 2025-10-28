@@ -228,14 +228,23 @@ export default function ApplicationForm() {
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<label className="block font-medium mb-1">Course *</label>
-						<input
-							type="text"
+						<select
 							value={course}
 							onChange={(e) => setCourse(e.target.value)}
 							className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
 							required
-						/>
+						>
+							<option value="">Select your course</option>
+							<option value="Computer Engineering">Computer Engineering</option>
+							<option value="Information Technology">Information Technology</option>
+							<option value="Robotics and AI">Robotics and AI</option>
+							<option value="Electronics and Telecommunication">
+								Electronics and Telecommunication
+							</option>
+							<option value="Mechanical Engineering">Mechanical Engineering</option>
+						</select>
 					</div>
+
 					<div className="flex items-center mt-6 gap-2">
 						<input
 							type="checkbox"

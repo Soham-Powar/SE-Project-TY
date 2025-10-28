@@ -1,16 +1,20 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useContext } from 'react';
-import { jwtDecode } from 'jwt-decode';
-import { AuthContext } from '../context/AuthContext';
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useContext } from "react";
+import { jwtDecode } from "jwt-decode";
+import { AuthContext } from "../context/AuthContext";
 
-import Landing from '../pages/Landing';
-import Login from '../pages/Login';
-import Signup from '../pages/Signup';
-import Home from '../pages/Home';
-import ApplicationForm from '../components/ApplicationForm';
-import AdminDashboard from '../components/AdminDashboard';
-import MISLoginPage from "../pages/MISLoginPage"
-import StudentDashboard from '../pages/StudentDashboard';
+// --- Pages ---
+import Landing from "../pages/Landing";
+import Login from "../pages/Login";
+import Signup from "../pages/Signup";
+import Home from "../pages/Home";
+import ApplicationForm from "../components/ApplicationForm";
+import AdminDashboard from "../components/AdminDashboard";
+
+// --- MIS Portal ---
+import MISLoginPage from "../pages/MISLoginPage";
+import StudentDashboard from "../pages/StudentDashboard";
+import TeacherDashboard from "../pages/TeacherDashboard";
 
 export default function AppRoutes() {
 	const { user } = useContext(AuthContext);
@@ -19,7 +23,7 @@ export default function AppRoutes() {
 	if (user?.token) {
 		try {
 			const decoded = jwtDecode(user.token);
-			isAdmin = decoded.email === 'admin@unimis.com';
+			isAdmin = decoded.email === "admin@unimis.com";
 		} catch {
 			isAdmin = false;
 		}
@@ -27,7 +31,7 @@ export default function AppRoutes() {
 
 	return (
 		<Routes>
-			{/* Public Routes */}
+			{/* ===== Public Landing ===== */}
 			<Route
 				path="/"
 				element={
@@ -38,22 +42,19 @@ export default function AppRoutes() {
 					)
 				}
 			/>
+
+			{/* ===== Admissions System Auth ===== */}
 			<Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
 			<Route path="/signup" element={!user ? <Signup /> : <Navigate to="/" />} />
 
-			{/* Authenticated User Routes */}
-			<Route
-				path="/home"
-				element={user ? <Home /> : <Navigate to="/login" />}
-			/>
+			{/* ===== Admissions Authenticated Routes ===== */}
+			<Route path="/home" element={user ? <Home /> : <Navigate to="/login" />} />
 			<Route
 				path="/apply"
 				element={user ? <ApplicationForm /> : <Navigate to="/login" />}
 			/>
-			<Route path="/mis/login" element={<MISLoginPage />} />
-			<Route path="/mis/student" element={<StudentDashboard />} />
 
-			{/* Admin Routes */}
+			{/* ===== Admin Panel ===== */}
 			<Route
 				path="/admin"
 				element={
@@ -65,7 +66,12 @@ export default function AppRoutes() {
 				}
 			/>
 
-			{/* Fallback */}
+			{/* ===== MIS PORTAL ===== */}
+			<Route path="/mis/login" element={<MISLoginPage />} />
+			<Route path="/mis/student" element={<StudentDashboard />} />
+			<Route path="/mis/teacher" element={<TeacherDashboard />} />
+
+			{/* ===== Fallback ===== */}
 			<Route path="*" element={<Navigate to="/" />} />
 		</Routes>
 	);

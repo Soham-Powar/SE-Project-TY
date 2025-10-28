@@ -28,8 +28,8 @@ app.use("/user", userRoutes);
 app.use("/application", applicationRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/mis/auth", misAuthRoutes);
-app.use("/admin", require("./routes/misRoutes/misAdminRoutes"));
-app.use("/teacher", require("./routes/misRoutes/misTeacherRoutes"));
+app.use("/mis/admin", require("./routes/misRoutes/misAdminRoutes"));
+app.use("/mis/teacher", require("./routes/misRoutes/misTeacherRoutes"));
 app.use("/mis/student", require("./routes/misRoutes/misStudentRoutes"));
 
 app.get("/", (req, res) => {

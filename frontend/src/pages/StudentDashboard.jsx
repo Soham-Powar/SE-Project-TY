@@ -6,7 +6,7 @@ export default function StudentDashboard() {
 	const [selected, setSelected] = useState([]);
 	const [enrolledSubjects, setEnrolledSubjects] = useState([]);
 	const [error, setError] = useState("");
-	const [modalSubject, setModalSubject] = useState(null); // 👈 NEW
+	const [modalSubject, setModalSubject] = useState(null);
 	const token = localStorage.getItem("mis_token");
 
 	// --- Fetch Profile + Existing Enrollments ---
@@ -20,7 +20,7 @@ export default function StudentDashboard() {
 				if (!res.ok) throw new Error(data.error || "Failed to fetch profile");
 				setStudent(data.student);
 
-				// Fetch already enrolled subjects
+				// Fetch already enrolled subjects (with attendance + marks)
 				const enrollRes = await fetch("http://localhost:3000/mis/student/enrollments", {
 					headers: { Authorization: `Bearer ${token}` },
 				});
@@ -75,21 +75,19 @@ export default function StudentDashboard() {
 		}
 	};
 
-	if (error) {
+	if (error)
 		return (
 			<div className="flex justify-center items-center min-h-screen">
 				<p className="text-red-600 text-lg font-medium">{error}</p>
 			</div>
 		);
-	}
 
-	if (!student) {
+	if (!student)
 		return (
 			<div className="flex justify-center items-center min-h-screen">
 				<p className="text-gray-600 text-lg">Loading your dashboard...</p>
 			</div>
 		);
-	}
 
 	return (
 		<div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-10 px-4">
@@ -140,7 +138,7 @@ export default function StudentDashboard() {
 								{enrolledSubjects.map((sub, i) => (
 									<li
 										key={i}
-										onClick={() => setModalSubject(sub)} // 👈 open modal
+										onClick={() => setModalSubject(sub)}
 										className="cursor-pointer border border-purple-200 bg-purple-50 px-4 py-2 rounded shadow-sm hover:bg-purple-100 transition"
 									>
 										{sub.subject_name}
@@ -236,11 +234,39 @@ export default function StudentDashboard() {
 							<span className="font-medium">Instructor:</span>{" "}
 							{modalSubject.instructor_name || "—"}
 						</p>
+
+						{/* Attendance */}
 						<p className="text-gray-700 mb-2">
-							<span className="font-medium">Marks:</span> — (coming soon)
+							<span className="font-medium">Attendance:</span>{" "}
+							{modalSubject.total_lectures > 0 ? (
+								<>
+									{modalSubject.lectures_attended}/{modalSubject.total_lectures} (
+									{(
+										(modalSubject.lectures_attended /
+											modalSubject.total_lectures) *
+										100
+									).toFixed(1)}
+									%)
+								</>
+							) : (
+								"Not available"
+							)}
 						</p>
+
+						{/* Marks */}
 						<p className="text-gray-700 mb-2">
-							<span className="font-medium">Attendance:</span> —% (coming soon)
+							<span className="font-medium">Marks:</span>{" "}
+							{Number(modalSubject.midsem_marks ?? 0).toFixed(2)}/30 +{" "}
+							{Number(modalSubject.endsem_marks ?? 0).toFixed(2)}/50 +{" "}
+							{Number(modalSubject.internal_marks ?? 0).toFixed(2)}/20 ={" "}
+							<b>
+								{(
+									(Number(modalSubject.midsem_marks ?? 0)) +
+									(Number(modalSubject.endsem_marks ?? 0)) +
+									(Number(modalSubject.internal_marks ?? 0))
+								).toFixed(2)}{" "}
+								/ 100
+							</b>
 						</p>
 
 						<button
@@ -252,7 +278,6 @@ export default function StudentDashboard() {
 					</div>
 				</div>
 			)}
-
 		</div>
 	);
 }

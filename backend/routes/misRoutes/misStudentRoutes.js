@@ -110,20 +110,26 @@ router.post("/subjects", verifyMISStudent, async (req, res) => {
   }
 });
 
+// ✅ Get student's enrolled subjects with marks + attendance + instructor
 router.get("/enrollments", verifyMISStudent, async (req, res) => {
   try {
     const { mis_id } = req.user;
 
     const result = await pool.query(
       `SELECT 
-			e.semester,
-			s.subject_id,
-			s.subject_name,
-			t.full_name AS instructor_name
-		 FROM enrollments e
-		 JOIN subjects s ON e.subject_id = s.subject_id
-		 LEFT JOIN teachers t ON s.teacher_id = t.teacher_id
-		 WHERE e.mis_id = $1 AND e.semester = 1`,
+         e.semester,
+         s.subject_name,
+         t.full_name AS instructor_name,
+         e.lectures_attended,
+         e.total_lectures,
+         e.midsem_marks,
+         e.endsem_marks,
+         e.internal_marks
+       FROM enrollments e
+       JOIN subjects s ON e.subject_id = s.subject_id
+       LEFT JOIN teachers t ON s.teacher_id = t.teacher_id
+       WHERE e.mis_id = $1 AND e.semester = 1
+       ORDER BY s.subject_name`,
       [mis_id]
     );
 

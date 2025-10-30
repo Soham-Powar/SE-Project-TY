@@ -31,7 +31,7 @@ const storage = multer.diskStorage({
     const ext = path.extname(file.originalname);
     let fileName;
 
-    if (file.fieldname === "receipt") fileName = "receipt" + ext;
+    if (file.fieldname === "id_document") fileName = "id_document" + ext;
     else if (file.fieldname === "merit_document")
       fileName = "merit_document" + ext;
     else fileName = Date.now() + "-" + file.originalname;
@@ -67,7 +67,7 @@ router.get("/check/:id", verifyToken, async (req, res) => {
 
     res.json({
       hasApplied: true,
-      application: result.rows[0], // includes fee_status, etc.
+      application: result.rows[0],
     });
   } catch (err) {
     console.error(err);
@@ -75,6 +75,7 @@ router.get("/check/:id", verifyToken, async (req, res) => {
   }
 });
 
+// 🟣 Get fee status for a specific user
 router.get("/status/:user_id", verifyToken, async (req, res) => {
   const { user_id } = req.params;
 
@@ -101,7 +102,7 @@ router.get("/status/:user_id", verifyToken, async (req, res) => {
 router.post(
   "/apply",
   upload.fields([
-    { name: "receipt", maxCount: 1 },
+    { name: "id_document", maxCount: 1 },
     { name: "merit_document", maxCount: 1 },
   ]),
   submitApplication

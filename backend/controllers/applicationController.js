@@ -37,22 +37,24 @@ const submitApplication = async (req, res) => {
     const email = userResult.rows[0].email;
 
     // 3️⃣ Uploaded file paths from multer
-    const receiptPath = req.files?.receipt ? req.files.receipt[0].path : null;
+    const idDocumentPath = req.files?.id_document
+      ? req.files.id_document[0].path
+      : null;
     const meritDocumentPath = req.files?.merit_document
       ? req.files.merit_document[0].path
       : null;
 
-    // check scholarship
+    // 4️⃣ Determine final fee status
     let fee_status_final = fee_status;
-    if (is_scholarship === "true") {
+    if (is_scholarship === "true" || is_scholarship === true) {
       fee_status_final = "scholarship";
     }
 
-    // 4️⃣ Insert new application
+    // 5️⃣ Insert new application
     await pool.query(
       `INSERT INTO applications 
         (user_id, email, firstname, middlename, lastname, dob, phone, address,
-         is_scholarship, fee_status, receipt_path, merit_document, course)
+         is_scholarship, fee_status, id_document_path, merit_document, course)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
       [
         user_id,
@@ -65,7 +67,7 @@ const submitApplication = async (req, res) => {
         address,
         is_scholarship === "true" || is_scholarship === true,
         fee_status_final,
-        receiptPath,
+        idDocumentPath,
         meritDocumentPath,
         course,
       ]
@@ -73,12 +75,11 @@ const submitApplication = async (req, res) => {
 
     res.status(201).json({
       message: "Application submitted successfully",
-      receipt_path: receiptPath,
+      id_document_path: idDocumentPath,
       merit_document: meritDocumentPath,
     });
   } catch (err) {
     console.error("Error inserting application:", err.message);
-    // 5️⃣ Handle unique constraint violation (if you add it in DB)
     if (err.code === "23505") {
       return res
         .status(400)

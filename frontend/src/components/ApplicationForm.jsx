@@ -16,7 +16,7 @@ export default function ApplicationForm() {
 	const [address, setAddress] = useState("");
 	const [course, setCourse] = useState("");
 	const [isScholarship, setIsScholarship] = useState(false);
-	const [receipt, setReceipt] = useState(null);
+	const [idDocument, setIdDocument] = useState(null);
 	const [meritDocument, setMeritDocument] = useState(null);
 
 	const [loading, setLoading] = useState(false);
@@ -41,16 +41,13 @@ export default function ApplicationForm() {
 				// ✅ Check if already applied + get fee status
 				const checkRes = await fetch(
 					`http://localhost:3000/application/check/${data.id}`,
-					{
-						headers: { Authorization: `Bearer ${user.token}` },
-					}
+					{ headers: { Authorization: `Bearer ${user.token}` } }
 				);
 				const checkData = await checkRes.json();
 
 				if (checkData.hasApplied) {
 					setHasApplied(true);
 					setMessage("✅ You have already submitted your application.");
-
 					if (checkData.application?.fee_status) {
 						setFeeStatus(checkData.application.fee_status);
 					}
@@ -83,7 +80,7 @@ export default function ApplicationForm() {
 			formData.append("course", course);
 			formData.append("is_scholarship", isScholarship);
 			formData.append("fee_status", feeStatus);
-			if (receipt) formData.append("receipt", receipt);
+			if (idDocument) formData.append("id_document", idDocument);
 			if (meritDocument) formData.append("merit_document", meritDocument);
 
 			const res = await fetch("http://localhost:3000/application/apply", {
@@ -108,9 +105,7 @@ export default function ApplicationForm() {
 	if (hasApplied) {
 		return (
 			<div className="max-w-2xl mx-auto p-8 bg-white rounded-2xl shadow-lg text-center">
-				<h2 className="text-3xl font-bold text-purple-700 mb-4">
-					Application Status
-				</h2>
+				<h2 className="text-3xl font-bold text-purple-700 mb-4">Application Status</h2>
 				<p className="text-green-600 text-lg font-medium mb-2">{message}</p>
 
 				<p className="text-gray-700 mb-4">
@@ -128,8 +123,7 @@ export default function ApplicationForm() {
 				</p>
 
 				<p className="text-gray-600">
-					Thank you, <span className="font-semibold">{email}</span>. You can
-					only submit once.
+					Thank you, <span className="font-semibold">{email}</span>. You can only submit once.
 				</p>
 			</div>
 		);
@@ -271,24 +265,31 @@ export default function ApplicationForm() {
 				</div>
 
 				{/* File Uploads */}
-				{["Fee Receipt", "Merit Document"].map((label, idx) => (
-					<div key={idx}>
-						<label className="block font-medium mb-1">
-							Upload {label} <span className="text-red-500">*</span>
-						</label>
-						<input
-							type="file"
-							onChange={(e) =>
-								idx === 0
-									? setReceipt(e.target.files[0])
-									: setMeritDocument(e.target.files[0])
-							}
-							accept=".pdf,.jpg,.png"
-							className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
-							required
-						/>
-					</div>
-				))}
+				<div>
+					<label className="block font-medium mb-1">
+						Upload Identification Document (PDF) <span className="text-red-500">*</span>
+					</label>
+					<input
+						type="file"
+						onChange={(e) => setIdDocument(e.target.files[0])}
+						accept=".pdf"
+						className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
+						required
+					/>
+				</div>
+
+				<div>
+					<label className="block font-medium mb-1">
+						Upload Merit Document (PDF) <span className="text-red-500">*</span>
+					</label>
+					<input
+						type="file"
+						onChange={(e) => setMeritDocument(e.target.files[0])}
+						accept=".pdf"
+						className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
+						required
+					/>
+				</div>
 
 				{/* Submit */}
 				<button
@@ -299,12 +300,8 @@ export default function ApplicationForm() {
 					{loading ? "Submitting..." : "Submit Application"}
 				</button>
 
-				{message && (
-					<p className="text-green-600 mt-4 font-medium text-center">{message}</p>
-				)}
-				{error && (
-					<p className="text-red-600 mt-4 font-medium text-center">{error}</p>
-				)}
+				{message && <p className="text-green-600 mt-4 font-medium text-center">{message}</p>}
+				{error && <p className="text-red-600 mt-4 font-medium text-center">{error}</p>}
 			</form>
 		</div>
 	);

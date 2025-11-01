@@ -108,23 +108,58 @@ router.post("/course", verifyMISAdmin, async (req, res) => {
 //
 // ✅ 6️⃣ Add a new teacher
 //
+//
+// ✅ 6️⃣ Add a new teacher (with users table entry)
+//
 router.post("/teacher", verifyMISAdmin, async (req, res) => {
+  const client = await pool.connect();
   try {
     const { full_name, email, phone, joined_on } = req.body;
 
     if (!full_name || !email || !phone)
       return res.status(400).json({ error: "Missing teacher details" });
 
-    await pool.query(
+    await client.query("BEGIN");
+
+    // Generate unique MIS ID for teacher
+    const countRes = await client.query("SELECT COUNT(*) FROM teachers");
+    const nextId = String(parseInt(countRes.rows[0].count) + 1).padStart(
+      4,
+      "0"
+    );
+    const misId = `MIS-TEA-${nextId}`;
+
+    // Insert into teachers table
+    await client.query(
       `INSERT INTO teachers (full_name, email, phone, joined_on)
        VALUES ($1, $2, $3, COALESCE($4, CURRENT_DATE))`,
       [full_name, email, phone, joined_on]
     );
 
-    res.json({ message: "Teacher added successfully" });
+    // Default password (can be reset later)
+    const bcrypt = require("bcryptjs");
+    const defaultPassword = "teacher123";
+    const hash = await bcrypt.hash(defaultPassword, 10);
+
+    // Insert into users table
+    await client.query(
+      `INSERT INTO users (email, password_hash, role, mis_id)
+       VALUES ($1, $2, 'teacher', $3)`,
+      [email, hash, misId]
+    );
+
+    await client.query("COMMIT");
+
+    res.json({
+      message: `Teacher added successfully. Default password is '${defaultPassword}'.`,
+      mis_id: misId,
+    });
   } catch (err) {
+    await client.query("ROLLBACK");
     console.error("Error adding teacher:", err);
     res.status(500).json({ error: "Failed to add teacher" });
+  } finally {
+    client.release();
   }
 });
 

@@ -86,6 +86,29 @@ export default function StudentDashboard() {
 		}
 	};
 
+	// 🆕 Generate certificate or card
+	const generateDocument = async (type) => {
+		try {
+			const res = await fetch(`http://localhost:3000/mis/student/certificate/${type}`, {
+				method: "GET",
+				headers: { Authorization: `Bearer ${token}` },
+			});
+			if (!res.ok) {
+				const err = await res.json();
+				throw new Error(err.error || "Failed to generate document");
+			}
+			const blob = await res.blob();
+			const url = window.URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = `${type}.pdf`;
+			a.click();
+			showToast(`${type} generated successfully!`, "success");
+		} catch (err) {
+			showToast(err.message, "error");
+		}
+	};
+
 	if (error)
 		return (
 			<div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-purple-100 to-white">
@@ -237,9 +260,7 @@ export default function StudentDashboard() {
 
 				{/* === Documents Section === */}
 				<section className="mt-10">
-					<h2 className="text-2xl font-semibold text-purple-700 mb-4">
-						Documents
-					</h2>
+					<h2 className="text-2xl font-semibold text-purple-700 mb-4">Documents</h2>
 					<div className="flex flex-col gap-2">
 						<a
 							href={`http://localhost:3000/${student.receipt_path}`}
@@ -257,6 +278,33 @@ export default function StudentDashboard() {
 						>
 							View Merit Document
 						</a>
+					</div>
+				</section>
+
+				{/* 🆕 === Certificates & Cards Section === */}
+				<section className="mt-10">
+					<h2 className="text-2xl font-semibold text-purple-700 mb-4">
+						Certificates & Cards
+					</h2>
+					<div className="flex flex-wrap gap-4">
+						<button
+							onClick={() => generateDocument("bonafide")}
+							className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-full shadow transition"
+						>
+							Generate Bonafide Certificate
+						</button>
+						<button
+							onClick={() => generateDocument("librarycard")}
+							className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full shadow transition"
+						>
+							Generate Library Card
+						</button>
+						<button
+							onClick={() => generateDocument("idcard")}
+							className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full shadow transition"
+						>
+							Generate Student ID Card
+						</button>
 					</div>
 				</section>
 			</motion.div>

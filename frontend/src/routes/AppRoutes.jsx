@@ -15,6 +15,7 @@ import AdminDashboard from "../components/AdminDashboard";
 import MISLoginPage from "../pages/MISLoginPage";
 import StudentDashboard from "../pages/StudentDashboard";
 import TeacherDashboard from "../pages/TeacherDashboard";
+import MISAdminDashboard from "../pages/MISAdminDashboard"
 
 export default function AppRoutes() {
 	const { user } = useContext(AuthContext);
@@ -70,6 +71,8 @@ export default function AppRoutes() {
 			<Route path="/mis/login" element={<MISLoginPage />} />
 			<Route path="/mis/student" element={<StudentDashboard />} />
 			<Route path="/mis/teacher" element={<TeacherDashboard />} />
+			<Route path="/mis/admin" element={<MISAdminDashboard />} />
+
 
 			{/* ===== Fallback ===== */}
 			<Route path="*" element={<Navigate to="/" />} />

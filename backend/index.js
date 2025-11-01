@@ -31,6 +31,7 @@ app.use("/mis/auth", misAuthRoutes);
 app.use("/mis/admin", require("./routes/misRoutes/misAdminRoutes"));
 app.use("/mis/teacher", require("./routes/misRoutes/misTeacherRoutes"));
 app.use("/mis/student", require("./routes/misRoutes/misStudentRoutes"));
+app.use("/mis/admin", require("./routes/misRoutes/misAdminRoutes"));
 
 app.get("/", (req, res) => {
   res.send("API is running....");

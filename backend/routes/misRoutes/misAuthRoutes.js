@@ -61,6 +61,8 @@ router.post("/login", async (req, res) => {
     if (!valid) console.log("Password mismatch");
     if (!valid) return res.status(401).json({ error: "Invalid credentials" });
 
+    console.log("JWT_SECRET inside login:", process.env.JWT_SECRET);
+
     const token = jwt.sign(
       { id: user.id, role: user.role, email: user.email, mis_id: user.mis_id },
       process.env.JWT_SECRET,

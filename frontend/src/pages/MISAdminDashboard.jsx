@@ -65,6 +65,23 @@ export default function AdminDashboard() {
 		}
 	};
 
+	// 🗑️ Delete Entity
+	const deleteEntity = async (entity, id) => {
+		if (!window.confirm(`Are you sure you want to delete this ${entity.slice(0, -1)}?`)) return;
+		try {
+			const res = await fetch(`http://localhost:3000/mis/admin/${entity}/${id}`, {
+				method: "DELETE",
+				headers: { Authorization: `Bearer ${token}` },
+			});
+			const result = await res.json();
+			if (!res.ok) throw new Error(result.error);
+			showToast(result.message, "success");
+			fetchAll();
+		} catch (err) {
+			showToast(err.message, "error");
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-purple-100 py-10 px-4">
 			<motion.div
@@ -136,6 +153,7 @@ export default function AdminDashboard() {
 										<th className="p-2">Email</th>
 										<th className="p-2">Phone</th>
 										<th className="p-2">Joined On</th>
+										<th className="p-2 text-center">Action</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -146,13 +164,19 @@ export default function AdminDashboard() {
 											<td className="p-2">{t.email}</td>
 											<td className="p-2">{t.phone}</td>
 											<td className="p-2">{new Date(t.joined_on).toLocaleDateString()}</td>
+											<td className="p-2 text-center">
+												<button
+													onClick={() => deleteEntity("teachers", t.teacher_id)}
+													className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+												>
+													Delete
+												</button>
+											</td>
 										</tr>
 									))}
 								</tbody>
 							</table>
 						</div>
-
-						{/* Add Teacher Form */}
 						<AddTeacherForm onSubmit={(data) => addEntity("teacher", data)} />
 					</motion.div>
 				)}
@@ -169,6 +193,7 @@ export default function AdminDashboard() {
 										<th className="p-2">Course Name</th>
 										<th className="p-2">Code</th>
 										<th className="p-2">Duration (Years)</th>
+										<th className="p-2 text-center">Action</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -178,13 +203,19 @@ export default function AdminDashboard() {
 											<td className="p-2">{c.course_name}</td>
 											<td className="p-2">{c.course_code}</td>
 											<td className="p-2">{c.duration}</td>
+											<td className="p-2 text-center">
+												<button
+													onClick={() => deleteEntity("courses", c.course_id)}
+													className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+												>
+													Delete
+												</button>
+											</td>
 										</tr>
 									))}
 								</tbody>
 							</table>
 						</div>
-
-						{/* Add Course Form */}
 						<AddCourseForm onSubmit={(data) => addEntity("course", data)} />
 					</motion.div>
 				)}
@@ -201,6 +232,7 @@ export default function AdminDashboard() {
 										<th className="p-2">Name</th>
 										<th className="p-2">Course</th>
 										<th className="p-2">Teacher</th>
+										<th className="p-2 text-center">Action</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -210,13 +242,19 @@ export default function AdminDashboard() {
 											<td className="p-2">{s.subject_name}</td>
 											<td className="p-2">{s.course_name}</td>
 											<td className="p-2">{s.teacher_name}</td>
+											<td className="p-2 text-center">
+												<button
+													onClick={() => deleteEntity("subjects", s.subject_id)}
+													className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+												>
+													Delete
+												</button>
+											</td>
 										</tr>
 									))}
 								</tbody>
 							</table>
 						</div>
-
-						{/* Add Subject Form */}
 						<AddSubjectForm
 							courses={courses}
 							teachers={teachers}
@@ -241,8 +279,7 @@ export default function AdminDashboard() {
 	);
 }
 
-/* === Updated Helper Forms === */
-
+/* === Helper Forms === */
 function AddCourseForm({ onSubmit }) {
 	const [course_name, setCourseName] = useState("");
 	const [course_code, setCode] = useState("");

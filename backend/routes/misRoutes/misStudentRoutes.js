@@ -5,7 +5,9 @@ const pool = require("../../db/misDB/pool");
 const PDFDocument = require("pdfkit");
 const QRCode = require("qrcode");
 
+//
 // ✅ Get student profile + course and subjects
+//
 router.get("/profile", verifyMISStudent, async (req, res) => {
   try {
     const { email } = req.user;
@@ -38,7 +40,9 @@ router.get("/profile", verifyMISStudent, async (req, res) => {
   }
 });
 
+//
 // ✅ Get subjects available for student’s course (for selection)
+//
 router.get("/subjects", verifyMISStudent, async (req, res) => {
   try {
     const { mis_id } = req.user;
@@ -71,7 +75,9 @@ router.get("/subjects", verifyMISStudent, async (req, res) => {
   }
 });
 
+//
 // ✅ Save selected subjects for this semester
+//
 router.post("/subjects", verifyMISStudent, async (req, res) => {
   try {
     const { mis_id } = req.user;
@@ -83,6 +89,7 @@ router.post("/subjects", verifyMISStudent, async (req, res) => {
     if (selectedSubjects.length > 5)
       return res.status(400).json({ error: "You can select only 5 subjects" });
 
+    // Remove old entries and insert new ones
     await pool.query("DELETE FROM enrollments WHERE mis_id=$1 AND semester=1", [
       mis_id,
     ]);
@@ -101,7 +108,9 @@ router.post("/subjects", verifyMISStudent, async (req, res) => {
   }
 });
 
+//
 // ✅ Get student's enrolled subjects with marks + attendance + instructor
+//
 router.get("/enrollments", verifyMISStudent, async (req, res) => {
   try {
     const { mis_id } = req.user;
@@ -131,7 +140,9 @@ router.get("/enrollments", verifyMISStudent, async (req, res) => {
   }
 });
 
-// 🆕 ✅ Generate Certificates / Cards (bonafide, librarycard, idcard)
+//
+// 🆕 ✅ Generate Certificates / Cards (bonafide, librarycard, idcard — no photo)
+//
 router.get("/certificate/:type", verifyMISStudent, async (req, res) => {
   try {
     const { type } = req.params;
@@ -177,7 +188,7 @@ router.get("/certificate/:type", verifyMISStudent, async (req, res) => {
     });
     doc.moveDown(2);
 
-    // Generate based on type
+    // Generate certificate by type
     switch (type.toLowerCase()) {
       case "bonafide":
         doc
@@ -228,7 +239,7 @@ He/She is studying in the academic year 2025–26.`,
           .font("Helvetica-Bold")
           .text("STUDENT ID CARD", { align: "center", underline: true });
         doc.moveDown(2);
-        doc.rect(100, 200, 400, 250).stroke();
+        doc.rect(100, 200, 400, 200).stroke(); // compact ID card, no photo
         doc.fontSize(12).text(`Name: ${s.full_name}`, 120, 220);
         doc.text(`Course: ${s.course_name}`, 120, 250);
         doc.text(
@@ -238,9 +249,7 @@ He/She is studying in the academic year 2025–26.`,
         );
         doc.text(`MIS ID: ${s.mis_id}`, 120, 310);
         doc.text(`Validity: July 2025 – June 2026`, 120, 340);
-        doc.rect(400, 220, 80, 100).stroke();
-        doc.fontSize(10).text("Photo", 425, 265);
-        doc.moveDown(8);
+        doc.moveDown(6);
         doc.text(`Issued on ${today}`, { align: "center" });
         break;
 

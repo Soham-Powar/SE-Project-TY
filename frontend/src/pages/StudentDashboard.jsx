@@ -263,7 +263,7 @@ export default function StudentDashboard() {
 					<h2 className="text-2xl font-semibold text-purple-700 mb-4">Documents</h2>
 					<div className="flex flex-col gap-2">
 						<a
-							href={`http://localhost:3000/${student.receipt_path}`}
+							href={`http://localhost:3000/${student.id_document_path}`}
 							target="_blank"
 							rel="noreferrer"
 							className="text-indigo-600 hover:underline"

@@ -195,22 +195,43 @@ router.get("/certificate/:type", verifyMISStudent, async (req, res) => {
           .fontSize(18)
           .font("Helvetica-Bold")
           .text("BONAFIDE CERTIFICATE", { align: "center", underline: true });
+
         doc.moveDown(2);
+
         doc
           .fontSize(13)
           .font("Helvetica")
           .text(
             `This is to certify that Mr./Ms. ${s.full_name} (MIS ID: ${s.mis_id}) 
-is a bonafide student of COEP Technological University enrolled in the ${s.course_name} program. 
-He/She is studying in the academic year 2025–26.`,
+      is a bonafide student of COEP Technological University enrolled in the ${s.course_name} program. 
+      He/She is studying in the academic year 2025–26.`,
             { align: "justify", lineGap: 6 }
           );
+
         doc.moveDown(2);
         doc.text(`Issued on ${today} for official use.`, { align: "justify" });
-        doc.moveDown(5);
+
+        // -------------------------------------------
+        // ADD SIGNATURE + STAMP IMAGES HERE
+        // -------------------------------------------
+
+        try {
+          doc.image("public/assets/sign.png", 60, 560, {
+            width: 120, // adjust for size
+          });
+
+          doc.image("public/assets/verified.jpg", 380, 540, {
+            width: 120,
+          });
+        } catch (err) {
+          console.log("Image load error:", err);
+        }
+
+        // Lines and titles
         doc.text("__________________________", 60, 600);
-        doc.text("Head of Department", 70, 615);
-        doc.text("Seal of Institute", 400, 615);
+        doc.text("Head of Department", 80, 615);
+        doc.text("Seal of Institute", 410, 615);
+
         break;
 
       case "librarycard":

@@ -90,7 +90,7 @@ export default function AdminDashboard() {
 				className="max-w-6xl mx-auto bg-white rounded-3xl shadow-xl p-8 border border-purple-100"
 			>
 				<h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 mb-8 text-center">
-					Admin Dashboard ⚙️
+					Admin Dashboard
 				</h1>
 
 				{/* Tabs */}

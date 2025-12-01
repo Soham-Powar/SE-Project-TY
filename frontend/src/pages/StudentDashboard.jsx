@@ -138,7 +138,7 @@ export default function StudentDashboard() {
 				className="max-w-5xl mx-auto bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-purple-100 relative z-10"
 			>
 				<h1 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 mb-6">
-					Welcome, {student.firstname} 🌸
+					Welcome, {student.firstname}
 				</h1>
 
 				{/* === Student Info === */}

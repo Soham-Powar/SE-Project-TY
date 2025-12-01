@@ -79,7 +79,7 @@ export default function ApplicationForm() {
 			formData.append("email", email);
 			formData.append("course", course);
 			formData.append("is_scholarship", isScholarship);
-			formData.append("fee_status", feeStatus);
+
 			if (idDocument) formData.append("id_document", idDocument);
 			if (meritDocument) formData.append("merit_document", meritDocument);
 
@@ -251,17 +251,6 @@ export default function ApplicationForm() {
 							Scholarship
 						</label>
 					</div>
-				</div>
-
-				{/* Fee Status */}
-				<div>
-					<label className="block font-medium mb-1">Fee Status</label>
-					<input
-						type="text"
-						value={feeStatus}
-						readOnly
-						className="w-full border px-3 py-2 rounded bg-gray-100 cursor-not-allowed"
-					/>
 				</div>
 
 				{/* File Uploads */}

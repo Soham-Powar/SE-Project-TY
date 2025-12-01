@@ -151,7 +151,7 @@ export default function AdminDashboard() {
 								</td>
 								<td className="border p-3 text-center">
 									<a
-										href={`http://localhost:3000/${app.receipt_path}`}
+										href={`http://localhost:3000/${app.id_document_path}`}
 										target="_blank"
 										rel="noopener noreferrer"
 										className="text-blue-500 hover:underline block"
